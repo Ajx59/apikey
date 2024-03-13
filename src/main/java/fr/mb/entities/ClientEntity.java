@@ -1,8 +1,6 @@
 package fr.mb.entities;
 
 import fr.mb.dto.ClientDto;
-import fr.mb.dto.UtilisateurDto;
-import fr.mb.security.ApiKey;
 import jakarta.persistence.*;
 import lombok.*;
 

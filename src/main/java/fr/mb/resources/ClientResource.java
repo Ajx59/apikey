@@ -2,9 +2,7 @@ package fr.mb.resources;
 
 import fr.mb.dto.ClientDto;
 import fr.mb.dto.MailDto;
-import fr.mb.dto.UtilisateurDto;
 import fr.mb.entities.ClientEntity;
-import fr.mb.entities.MailEntity;
 import fr.mb.registerRestClient.ServiceMail;
 import fr.mb.repositories.ClientRepository;
 import fr.mb.repositories.MailRepository;
@@ -18,7 +16,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.awt.*;
 import java.util.List;
 
 @Path("/Clients/")
@@ -54,35 +51,24 @@ public class ClientResource {
     @APIResponse(responseCode = "201", description = "La ressource a été crée !")
     @APIResponse(responseCode = "500",  description = "Le serveur a rencontré un problème !")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(@QueryParam("Email") String email,@QueryParam("Nom Client")String nomClient, @QueryParam("Quota Email") Integer quota, @Context UriInfo uriInfo){
-        ClientEntity client = new ClientEntity();
-        client.setApiKey(ApiKey.generateKey());
-        client.setEmail(email);
-        client.setNomClient(nomClient);
-        client.setQuota(quota);
-        client.setCompteActif(true);
-        clientRepository.persist(client);
-        UriBuilder uriBuilder = uriInfo.getRequestUriBuilder();
-        uriBuilder.path(client.getIdClient().toString());
-        //bloque la création
-       /* MailDto mailDto = new MailDto(client.getEmail(), "Service Api Key", "Voici votre clé api," + client.getApiKey() + " Enregistrer la et ne la perdez pas !");
-        serviceMail.envoyerMail("azerty", mailDto);*/
-        return Response.created(uriBuilder.build()).build();
-    }
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response createUser(ClientDto clientDto){
+            try{
+                ClientEntity client = new ClientEntity();
+                client.setApiKey(ApiKey.generateKey());
+                client.setEmail(clientDto.getEmail());
+                client.setNomClient(clientDto.getNomClient());
+                client.setQuota(clientDto.getQuota());
+                client.setCompteActif(true);
+                clientRepository.persist(client);
+                MailDto mailDto = new MailDto(client);
+                mailDto.mailClientCreated(client.getApiKey(),mailDto);
+                serviceMail.envoyerMail("azerty", mailDto);
+                return Response.ok().build();
+            }catch (Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Une erreur est survenue : " + e.getMessage()).build();
+            }
 
-    @Transactional
-    @POST
-    @APIResponse(responseCode = "201", description = "La ressource a été crée !")
-    @APIResponse(responseCode = "500",  description = "Le serveur a rencontré un problème !")
-    @Path("/{id}/mail")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createEmail(@PathParam("id")Integer id, MailDto mailDto) {
-        ClientEntity client = clientRepository.findById(id);
-        if(client == null)
-            return Response.status(Response.Status.NOT_FOUND).build();
-        MailEntity mail = new MailEntity(mailDto, client);
-        mailRepository.persist(mail);
-        return Response.ok().build();
     }
 
     @Transactional

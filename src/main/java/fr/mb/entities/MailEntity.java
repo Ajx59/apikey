@@ -1,13 +1,12 @@
 package fr.mb.entities;
 
-import fr.mb.dto.MailDto;
+import fr.mb.dto.MailHistoriqueDto;
 import jakarta.persistence.*;
-import jakarta.ws.rs.client.Client;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Entity(name ="MAIL")
+@Entity(name ="MAIL_HISTORIQUE")
 @Getter
 @Setter
 public class MailEntity {
@@ -15,20 +14,21 @@ public class MailEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mail")
     private Integer idMail;
-    @Column(name = "destinataton")
+    @Column(name = "destinataire")
     private String destinataire;
     @Column(name = "objet")
     private String objet;
     @Column(name = "date_envoi")
-    private LocalDate dateEnvoi;
+    private LocalDateTime dateEnvoi;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_client")
+    @JoinColumn(name = "id_client", referencedColumnName = "id_client")
     private ClientEntity client;
 
-    public MailEntity(MailDto mailDto, ClientEntity client) {
-        this.destinataire = mailDto.getDestinataire();
-        this.objet = mailDto.getObjet();
-        this.dateEnvoi = LocalDate.now();
+    public MailEntity(MailHistoriqueDto mailHistoriqueDto, ClientEntity client) {
+        this.destinataire = mailHistoriqueDto.getDestinataire();
+        this.objet = mailHistoriqueDto.getObjet();
+        this.dateEnvoi = LocalDateTime.now();
         this.client = client;
     }
 

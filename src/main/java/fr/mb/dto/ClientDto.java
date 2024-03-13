@@ -1,5 +1,6 @@
 package fr.mb.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.mb.entities.ClientEntity;
 import lombok.Getter;
@@ -12,27 +13,22 @@ import java.util.List;
 @Setter
 public class ClientDto {
     @JsonProperty(index = 1)
-    private Integer idClient;
-    @JsonProperty(index = 2)
-    private String apiKey;
-    @JsonProperty(index = 3)
     private String email;
-    @JsonProperty(index = 4)
+    @JsonProperty(index = 2)
     private String nomClient;
-    @JsonProperty(index = 5)
+    @JsonProperty(index = 3)
     private int quota;
-    @JsonProperty(index = 6)
-    private boolean active;
 
 
     //Class qui permet de récupérer un client en base
     public ClientDto(ClientEntity clientEntity){
-        idClient = clientEntity.getIdClient();
-        apiKey = clientEntity.getApiKey();
         email = clientEntity.getEmail();
         nomClient = clientEntity.getNomClient();
         quota = clientEntity.getQuota();
-        active = clientEntity.isCompteActif();
+    }
+
+    public ClientDto() {
+
     }
 
     public static List<ClientDto> toDtoList(List<ClientEntity> clientEntities){
@@ -41,5 +37,6 @@ public class ClientDto {
             clientDtoList.add(new ClientDto(clientEntity));
         return clientDtoList;
     }
+
 
 }

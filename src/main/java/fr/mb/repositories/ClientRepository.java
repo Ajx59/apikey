@@ -23,9 +23,4 @@ public class ClientRepository implements PanacheRepositoryBase<ClientEntity, Int
         return isValid;
     }
 
-    public ClientEntity clientByApiKey(String apiKey){
-        ClientEntity client = find("apiKey", apiKey).firstResult();
-        return client;
-    }
-
 }
